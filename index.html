@@ -67,6 +67,11 @@
 
     .footer{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    #btnSpinHold {
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
   </style>
 </head>
 <body>
@@ -228,10 +233,12 @@
     }
 
     function pickIndex(){
-      const n = participants.length; if(n===0) return -1;
-      const arc = 2*Math.PI/n;
-      const a = (2*Math.PI - (angle%(2*Math.PI)) + arc/2)%(2*Math.PI);
-      return Math.floor(a/arc)%n;
+        const n = participants.length;
+        if (n === 0) return -1;
+        const arc = 2 * Math.PI / n;
+        const pointer = -Math.PI / 2;
+        const a = (pointer - (angle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+        return Math.floor((a + arc/2) / arc) % n;
     }
 
     function onStop(){
@@ -284,8 +291,11 @@
     btnInit.addEventListener('click', init);
     btnReset.addEventListener('click', ()=>{namesEl.value=''; chipsEl.innerHTML=''; participants=[]; winners=[]; history=[]; drawWheel(); renderHistory(); winnerEl.textContent=''; statN.textContent='0'});
     btnSpinHold.addEventListener('mousedown', spinHoldStart);
+    btnSpinHold.addEventListener('touchstart', spinHoldStart);
     btnSpinHold.addEventListener('mouseup', spinHoldEnd);
+    btnSpinHold.addEventListener('touchend', spinHoldEnd);
     btnSpinHold.addEventListener('mouseleave', spinHoldEnd);
+    btnSpinHold.addEventListener('touchleave', spinHoldEnd);
     btnSpinOne.addEventListener('click', spinOne);
     btnStop.addEventListener('click', forceStop);
 
