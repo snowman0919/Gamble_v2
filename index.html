@@ -127,6 +127,8 @@
   </div>
 
   <script>
+    const spinSound = new Audio('./sounds/spin-loop.mp3');
+    const winSound = new Audio('./sounds/win-chime.mp3');
     const el = s => document.querySelector(s);
     const namesEl = el('#names');
     const chipsEl = el('#chips');
@@ -157,6 +159,20 @@
     let raf = null;
     let spinning = false;
     let pressTimer = null;
+
+    function maybePlaySpin(){
+        if (!soundOnEl || soundOnEl.checked) {
+            try { spinSound.currentTime = 0; spinSound.play(); } catch(e){}
+        }
+    }
+    function stopSpinSound(){
+        try { spinSound.pause(); spinSound.currentTime = 0; } catch(e){}
+    }
+    function playWin(){
+        if (!soundOnEl || soundOnEl.checked) {
+            try { winSound.currentTime = 0; winSound.play(); } catch(e){}
+        }
+    }
 
     function parseNames(){
       const raw = namesEl.value.replace(/\n/g, ',');
@@ -282,11 +298,11 @@
       statV.textContent = '0'; statA.textContent = '0';
     }
 
-    function spinHoldStart(){ if(spinning||participants.length===0) return; spinning=true; angVel=0.05; step(); pressTimer=setInterval(()=>{angVel=Math.min(angVel+0.02, 1.35)}, 60) }
+    function spinHoldStart(){ if(spinning||participants.length===0) return; spinning=true; angVel=0.05; step(); maybePlaySpin(); pressTimer=setInterval(()=>{angVel=Math.min(angVel+0.02, 1.35)}, 60) }
     function spinHoldEnd(){ clearInterval(pressTimer); pressTimer=null }
 
-    function spinOne(){ if(spinning||participants.length===0) return; spinning=true; angVel = 0.35 + Math.random()*0.9; step() }
-    function forceStop(){ if(!spinning) return; angVel = Math.min(angVel, 0.02) }
+    function spinOne(){ if(spinning||participants.length===0) return; maybePlaySpin(); spinning=true; angVel = 0.35 + Math.random()*0.9; step() }
+    function forceStop(){ if(!spinning) return; stopSpinSound(); angVel = Math.min(angVel, 0.001) }
 
     btnInit.addEventListener('click', init);
     btnReset.addEventListener('click', ()=>{namesEl.value=''; chipsEl.innerHTML=''; participants=[]; winners=[]; history=[]; drawWheel(); renderHistory(); winnerEl.textContent=''; statN.textContent='0'});
