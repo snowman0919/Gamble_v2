@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>발표자 뽑기 V2</title>
+  <style>
+    :root{
+      --bg:#0b0d12;--panel:#131722;--panel-2:#0f1320;--text:#e6ebf5;--muted:#9aa4b2;--accent:#7aa2ff;--accent-2:#9d7aff;--ring:rgba(122,162,255,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;background:radial-gradient(1200px 800px at 10% -10%, #1b2140 0%, transparent 60%),
+               radial-gradient(1000px 800px at 100% 0%, #182433 0%, transparent 60%),
+               linear-gradient(180deg, #0a0d14 0%, #0b0d12 100%);
+      color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Helvetica,Arial;letter-spacing:.2px
+    }
+    .container{max-width:1100px;margin:0 auto;padding:28px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .title{font-size:22px;font-weight:800;letter-spacing:.3px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:18px;backdrop-filter:blur(8px)}
+    .grid{display:grid;grid-template-columns:360px 1fr;gap:18px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+
+    .section-title{font-size:13px;color:var(--muted);margin:0 0 8px 2px}
+
+    .input, .number, .select, .btn{
+      background:var(--panel);border:1px solid rgba(255,255,255,.08);color:var(--text);
+      border-radius:12px;padding:12px 14px;font-size:14px;outline:none
+    }
+    .input:focus, .number:focus, .select:focus{border-color:var(--ring);box-shadow:0 0 0 6px var(--ring)}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn{cursor:pointer;user-select:none;border-radius:12px;padding:12px 16px;transition:.2s ease;display:inline-flex;gap:8px;align-items:center}
+    .btn.primary{background:linear-gradient(180deg, #2a3d7a, #1d2b5a);border-color:#2b3f80}
+    .btn.primary:hover{filter:brightness(1.08)}
+    .btn.ghost{background:var(--panel-2)}
+    .btn.warn{background:#3b1d21;border-color:#5a2a31}
+    .btn.success{background:#1f3a28;border-color:#2c5038}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+
+    .stack{display:flex;flex-direction:column;gap:10px}
+    textarea.input{min-height:110px;resize:vertical}
+
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .chip{font-size:12px;padding:6px 10px;border-radius:999px;background:var(--panel-2);border:1px solid rgba(255,255,255,.06)}
+
+    .wheel-wrap{display:grid;grid-template-rows:auto auto;place-items:center;gap:16px}
+    .canvas-shell{position:relative;width:min(520px, 92vw);aspect-ratio:1;border-radius:24px;padding:14px;background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06)}
+    canvas{width:100%;height:100%;display:block;border-radius:16px;background:radial-gradient(120% 120% at 50% 40%, #141b2c 0%, #0f1422 60%, #0b0d12 100%)}
+    .pointer{position:absolute;inset:auto 0 90% 0;margin:auto;width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:24px solid var(--accent);transform:translateY(-8px)}
+
+    .readout{font-feature-settings:"tnum" on, "lnum" on;display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:center}
+    .pill{padding:8px 12px;border-radius:999px;background:var(--panel);border:1px solid rgba(255,255,255,.08);font-size:13px;color:var(--muted)}
+
+    .result{display:flex;flex-direction:column;gap:8px}
+    .result .who{font-size:18px;font-weight:700}
+    .history{display:flex;flex-direction:column;gap:6px;max-height:180px;overflow:auto}
+    .history-item{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;background:var(--panel-2);border:1px solid rgba(255,255,255,.06)}
+
+    .tog{display:flex;align-items:center;gap:8px}
+    .tog input{appearance:none;width:38px;height:22px;border-radius:999px;background:#25304a;position:relative;outline:none;border:1px solid rgba(255,255,255,.08);cursor:pointer}
+    .tog input:checked{background:#2f4fb1}
+    .tog input::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:1px;left:1px;transition:.2s ease}
+    .tog input:checked::after{left:calc(100% - 19px)}
+
+    .footer{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="title">발표자 뽑기 V2</div>
+      <div class="row">
+        <button id="btnExport" class="btn ghost">결과 복사</button>
+        <button id="btnReset" class="btn warn">초기화</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card stack">
+        <p class="section-title">참여자 입력</p>
+        <textarea id="names" class="input" placeholder="쉼표 또는 줄바꿈으로 구분" spellcheck="false">1번 강원재, 2번 구본정, 3번 김가은, 4번 김도경, 5번 김리온, 6번 김서진, 7번 김서현, 8번 김하윤, 9번 김현우, 10번 김호성, 11번 남우진, 12번 박서윤, 13번 박선영, 14번 박소은, 15번 박준우, 16번 손지완, 17번 여서연, 18번 여지원, 19번 유정훈, 20번 이수영, 21번 이지환, 22번 이호연, 23번 장준혁, 24번 정찬빈, 25번 조예원, 26번 조원, 27번 진서윤, 28번 최윤혁, 29번 최혁, 30번 한예성, 31번 홍성현</textarea>
+        <div id="chips" class="chips"></div>
+        <div class="row">
+          <label class="section-title">뽑을 인원</label>
+          <input id="count" class="number" type="number" min="1" value="1" style="width:90px"/>
+          <div class="tog"><input id="noRepeat" type="checkbox" checked><span class="section-title">중복 금지</span></div>
+          <div class="tog"><input id="autoNext" type="checkbox" checked><span class="section-title">자동 반복</span></div>
+        </div>
+        <div class="row">
+          <button id="btnInit" class="btn success">돌림판 생성</button>
+          <button id="btnSpinHold" class="btn primary">누르고 회전</button>
+          <button id="btnSpinOne" class="btn primary">원클릭 회전</button>
+          <button id="btnStop" class="btn ghost">멈추기</button>
+        </div>
+        <div class="readout">
+          <div class="pill mono">참가자: <span id="statN">0</span></div>
+          <div class="pill mono">속도: <span id="statV">0</span></div>
+          <div class="pill mono">각도: <span id="statA">0</span></div>
+        </div>
+        <div class="result">
+          <div id="resultTitle" class="section-title">결과</div>
+          <div id="winner" class="who"></div>
+          <div id="history" class="history"></div>
+        </div>
+      </section>
+
+      <section class="card wheel-wrap">
+        <div class="canvas-shell">
+          <div class="pointer"></div>
+          <canvas id="wheelCanvas" width="1000" height="1000"></canvas>
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer" style="margin-top:16px">
+      <div class="section-title">포인터가 가리키는 칸이 당첨입니다.</div>
+    </footer>
+  </div>
+
+  <script>
+    const el = s => document.querySelector(s);
+    const namesEl = el('#names');
+    const chipsEl = el('#chips');
+    const countEl = el('#count');
+    const noRepeatEl = el('#noRepeat');
+    const autoNextEl = el('#autoNext');
+    const btnInit = el('#btnInit');
+    const btnSpinHold = el('#btnSpinHold');
+    const btnSpinOne = el('#btnSpinOne');
+    const btnStop = el('#btnStop');
+    const btnExport = el('#btnExport');
+    const btnReset = el('#btnReset');
+    const statN = el('#statN');
+    const statV = el('#statV');
+    const statA = el('#statA');
+    const winnerEl = el('#winner');
+    const historyEl = el('#history');
+
+    const canvas = el('#wheelCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let participants = [];
+    let winners = [];
+    let history = [];
+
+    let angle = 0;
+    let angVel = 0;
+    let raf = null;
+    let spinning = false;
+    let pressTimer = null;
+
+    function parseNames(){
+      const raw = namesEl.value.replace(/\n/g, ',');
+      const parts = raw.split(',').map(s=>s.trim()).filter(Boolean);
+      const dedup = Array.from(new Set(parts));
+      return dedup;
+    }
+
+    function renderChips(){
+      chipsEl.innerHTML = '';
+      participants.forEach((p,i)=>{
+        const d = document.createElement('div');
+        d.className = 'chip';
+        d.textContent = p;
+        chipsEl.appendChild(d);
+      });
+      statN.textContent = participants.length;
+    }
+
+    function colorFor(i, n){
+      const h = (i*360/n)%360;return `hsl(${h} 70% 62%)`;
+    }
+
+    function drawWheel(){
+      const n = participants.length;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      if(n===0){
+        ctx.fillStyle = '#121826';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        return;
+      }
+      const cx = canvas.width/2, cy = canvas.height/2, r = canvas.width*0.48;
+      const arc = 2*Math.PI/n;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+      for(let i=0;i<n;i++){
+        ctx.beginPath();
+        ctx.moveTo(0,0);
+        ctx.arc(0,0,r,i*arc,(i+1)*arc);
+        ctx.closePath();
+        ctx.fillStyle = colorFor(i,n);
+        ctx.fill();
+        ctx.save();
+        ctx.rotate(i*arc + arc/2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#0b0d12';
+        ctx.font = '32px Pretendard, Arial';
+        ctx.fillText(participants[i], r-24, 10);
+        ctx.restore();
+      }
+      ctx.beginPath();
+      ctx.arc(0,0,r,0,Math.PI*2);
+      ctx.lineWidth = 18;
+      const grd = ctx.createLinearGradient(-r,-r,r,r);
+      grd.addColorStop(0,'#2c395e');
+      grd.addColorStop(1,'#202a49');
+      ctx.strokeStyle = grd;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function step(){
+      if(!spinning) return;
+      angle += angVel;
+      angVel *= 0.9925;
+      if(angVel < 0.002){
+        angVel = 0; spinning = false; cancelAnimationFrame(raf); raf=null; onStop(); return;
+      }
+      statV.textContent = angVel.toFixed(3);
+      statA.textContent = ((angle%(2*Math.PI))*180/Math.PI).toFixed(1);
+      drawWheel();
+      raf = requestAnimationFrame(step);
+    }
+
+    function pickIndex(){
+      const n = participants.length; if(n===0) return -1;
+      const arc = 2*Math.PI/n;
+      const a = (2*Math.PI - (angle%(2*Math.PI)) + arc/2)%(2*Math.PI);
+      return Math.floor(a/arc)%n;
+    }
+
+    function onStop(){
+      drawWheel();
+      const idx = pickIndex();
+      if(idx<0) return;
+      const picked = participants[idx];
+      winners.push(picked);
+      history.unshift({name:picked, ts:new Date().toLocaleString()});
+      winnerEl.textContent = `당첨: ${picked}`;
+      renderHistory();
+      if(noRepeatEl.checked){
+        participants.splice(idx,1);
+        drawWheel();
+        renderChips();
+      }
+      const remainToPick = Math.max(0, Number(countEl.value||1) - winners.length);
+      if(autoNextEl.checked && remainToPick>0 && participants.length>0){
+        setTimeout(()=>spinOne(), 700);
+      }
+    }
+
+    function renderHistory(){
+      historyEl.innerHTML = '';
+      history.slice(0,50).forEach(h=>{
+        const d = document.createElement('div');
+        d.className = 'history-item';
+        const l = document.createElement('div'); l.textContent = h.name;
+        const r = document.createElement('div'); r.className='section-title'; r.textContent = h.ts;
+        d.appendChild(l); d.appendChild(r); historyEl.appendChild(d);
+      });
+    }
+
+    function init(){
+      participants = parseNames();
+      winners = [];
+      angle = 0; angVel = 0; spinning=false; if(raf){cancelAnimationFrame(raf); raf=null}
+      renderChips();
+      drawWheel();
+      winnerEl.textContent = '';
+      statV.textContent = '0'; statA.textContent = '0';
+    }
+
+    function spinHoldStart(){ if(spinning||participants.length===0) return; spinning=true; angVel=0.05; step(); pressTimer=setInterval(()=>{angVel=Math.min(angVel+0.02, 1.35)}, 60) }
+    function spinHoldEnd(){ clearInterval(pressTimer); pressTimer=null }
+
+    function spinOne(){ if(spinning||participants.length===0) return; spinning=true; angVel = 0.35 + Math.random()*0.9; step() }
+    function forceStop(){ if(!spinning) return; angVel = Math.min(angVel, 0.02) }
+
+    btnInit.addEventListener('click', init);
+    btnReset.addEventListener('click', ()=>{namesEl.value=''; chipsEl.innerHTML=''; participants=[]; winners=[]; history=[]; drawWheel(); renderHistory(); winnerEl.textContent=''; statN.textContent='0'});
+    btnSpinHold.addEventListener('mousedown', spinHoldStart);
+    btnSpinHold.addEventListener('mouseup', spinHoldEnd);
+    btnSpinHold.addEventListener('mouseleave', spinHoldEnd);
+    btnSpinOne.addEventListener('click', spinOne);
+    btnStop.addEventListener('click', forceStop);
+
+    namesEl.addEventListener('input', ()=>{participants=parseNames(); renderChips(); drawWheel()});
+    countEl.addEventListener('input', ()=>{if(Number(countEl.value)<1) countEl.value=1});
+
+    btnExport.addEventListener('click', ()=>{
+      const txt = winners.length? `당첨자 ${winners.length}명\n`+winners.join('\n') : '당첨 내역이 없습니다.';
+      navigator.clipboard.writeText(txt).then(()=>{btnExport.textContent='복사 완료'; setTimeout(()=>btnExport.textContent='결과 복사',1200)});
+    });
+
+    init();
+  </script>
+</body>
+</html>
