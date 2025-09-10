@@ -1,4 +1,3 @@
-# Gamble_v2
 # 발표자 뽑기 (Random Picker Wheel)
 
 웹에서 실행되는 발표자 뽑기 휠 프로젝트입니다.
