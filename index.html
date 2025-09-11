@@ -11,16 +11,16 @@
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0;background:radial-gradient(1200px 800px at 10% -10%, #1b2140 0%, transparent 60%),
-               radial-gradient(1000px 800px at 100% 0%, #182433 0%, transparent 60%),
-               linear-gradient(180deg, #0a0d14 0%, #0b0d12 100%);
+      margin:0;background:
+        radial-gradient(1200px 800px at 10% -10%, #1b2140 0%, transparent 60%),
+        radial-gradient(1000px 800px at 100% 0%, #182433 0%, transparent 60%),
+        linear-gradient(180deg, #0a0d14 0%, #0b0d12 100%);
       color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Helvetica,Arial;letter-spacing:.2px
     }
     .container{max-width:1100px;margin:0 auto;padding:28px}
     header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}
     .title{font-size:22px;font-weight:800;letter-spacing:.3px}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-      border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:18px;backdrop-filter:blur(8px)}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:18px;backdrop-filter:blur(8px)}
     .grid{display:grid;grid-template-columns:360px 1fr;gap:18px}
     @media (max-width:980px){.grid{grid-template-columns:1fr}}
 
@@ -49,7 +49,7 @@
     .wheel-wrap{display:grid;grid-template-rows:auto auto;place-items:center;gap:16px}
     .canvas-shell{position:relative;width:min(520px, 92vw);aspect-ratio:1;border-radius:24px;padding:14px;background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06)}
     canvas{width:100%;height:100%;display:block;border-radius:16px;background:radial-gradient(120% 120% at 50% 40%, #141b2c 0%, #0f1422 60%, #0b0d12 100%)}
-    .pointer{position:absolute;inset:auto 0 90% 0;margin:auto;width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:24px solid var(--accent);transform:translateY(-8px)}
+    .pointer{position:absolute;left:0;right:0;top:20px;margin:auto;width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:24px solid var(--accent)}
 
     .readout{font-feature-settings:"tnum" on, "lnum" on;display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:center}
     .pill{padding:8px 12px;border-radius:999px;background:var(--panel);border:1px solid rgba(255,255,255,.08);font-size:13px;color:var(--muted)}
@@ -67,16 +67,7 @@
 
     .footer{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
-    #btnInit {
-        touch-action: none;
-        -webkit-user-select: none;
-        user-select: none;
-    }
-    #btnSpinHold {
-        touch-action: none;
-        -webkit-user-select: none;
-        user-select: none;
-    }
+    #btnInit, #btnSpinHold { touch-action:none; -webkit-user-select:none; user-select:none; }
   </style>
 </head>
 <body>
@@ -92,13 +83,17 @@
     <div class="grid">
       <section class="card stack">
         <p class="section-title">참여자 입력</p>
-        <textarea id="names" class="input" placeholder="쉼표 또는 줄바꿈으로 구분" spellcheck="false">1번 강원재, 2번 구본정, 3번 김가은, 4번 김도경, 5번 김리온, 6번 김서진, 7번 김서현, 8번 김하윤, 9번 김현우, 10번 김호성, 11번 남우진, 12번 박서윤, 13번 박선영, 14번 박소은, 15번 박준우, 16번 손지완, 17번 여서연, 18번 여지원, 19번 유정훈, 20번 이수영, 21번 이지환, 22번 이호연, 23번 장준혁, 24번 정찬빈, 25번 조예원, 26번 조원, 27번 진서윤, 28번 최윤혁, 29번 최혁, 30번 한예성, 31번 홍성현</textarea>
+        <textarea id="names" class="input" placeholder="쉼표 또는 줄바꿈. 가중치는 *숫자 (예: 홍길동*3)" spellcheck="false">1번 강원재*1, 2번 구본정*1, 3번 김가은*1, 4번 김도경*1, 5번 김리온*1, 6번 김서진*1, 7번 김서현*1, 8번 김하윤*1, 9번 김현우*1, 10번 김호성*1, 11번 남우진*1, 12번 박서윤*1, 13번 박선영*1, 14번 박소은*1, 15번 박준우*1, 16번 손지완*1, 17번 여서연*1, 18번 여지원*1, 19번 유정훈*1, 20번 이수영*1, 21번 이지환*1, 22번 이호연*1, 23번 장준혁*1, 24번 정찬빈*1, 25번 조예원*1, 26번 조원*1, 27번 진서윤*1, 28번 최윤혁*1, 29번 최혁*1, 30번 한예성*1, 31번 홍성현*1</textarea>
         <div id="chips" class="chips"></div>
         <div class="row">
           <label class="section-title">뽑을 인원</label>
           <input id="count" class="number" type="number" min="1" value="1" style="width:90px"/>
-          <div class="tog"><input id="noRepeat" type="checkbox" checked><span class="section-title">중복 금지</span></div>
+          <div class="tog"><input id="noRepeat" type="checkbox" unchecked><span class="section-title">중복 금지</span></div>
           <div class="tog"><input id="autoNext" type="checkbox" checked><span class="section-title">자동 반복</span></div>
+        </div>
+        <div class="row">
+          <div class="tog"><input id="soundOn" type="checkbox" unchecked><span class="section-title">사운드</span></div>
+          <input id="vol" class="number" type="range" min="0" max="1" step="0.01" value="0.6" style="width:160px"/>
         </div>
         <div class="row">
           <button id="btnInit" class="btn success">돌림판 생성</button>
@@ -131,15 +126,23 @@
     </footer>
   </div>
 
+  <audio id="spinAudio" preload="auto" src="./sounds/spin-loop.mp3"></audio>
+  <audio id="winAudio" preload="auto"  src="./sounds/win-chime.mp3"></audio>
+
   <script>
-    const spinSound = new Audio('./sounds/spin-loop.mp3');
-    const winSound = new Audio('./sounds/win-chime.mp3');
     const el = s => document.querySelector(s);
+
+    const spinSound = el('#spinAudio');
+    const winSound  = el('#winAudio');
+
     const namesEl = el('#names');
     const chipsEl = el('#chips');
     const countEl = el('#count');
     const noRepeatEl = el('#noRepeat');
     const autoNextEl = el('#autoNext');
+    const soundOnEl = el('#soundOn');
+    const volEl = el('#vol');
+
     const btnInit = el('#btnInit');
     const btnSpinHold = el('#btnSpinHold');
     const btnSpinOne = el('#btnSpinOne');
@@ -155,7 +158,7 @@
     const canvas = el('#wheelCanvas');
     const ctx = canvas.getContext('2d');
 
-    let participants = [];
+    let participants = []; // [{name, weight}]
     let winners = [];
     let history = [];
 
@@ -165,72 +168,98 @@
     let spinning = false;
     let pressTimer = null;
 
-    function maybePlaySpin(){
-        if (!soundOnEl || soundOnEl.checked) {
-            try { spinSound.currentTime = 0; spinSound.play(); } catch(e){}
-        }
+    function applyVolume(){
+      const v = Number(volEl?.value ?? 0.6);
+      spinSound.volume = v;
+      winSound.volume  = Math.min(1, v + 0.15);
+    }
+
+    function playSpin(){
+      if (!soundOnEl || soundOnEl.checked){
+        try { spinSound.currentTime = 0; spinSound.loop = true; spinSound.play(); } catch(e){}
+      }
     }
     function stopSpinSound(){
-        try { spinSound.pause(); spinSound.currentTime = 0; } catch(e){}
+      try { spinSound.pause(); } catch(e){}
+      try { spinSound.currentTime = 0; } catch(e){}
     }
     function playWin(){
-        if (!soundOnEl || soundOnEl.checked) {
-            try { winSound.currentTime = 0; winSound.play(); } catch(e){}
-        }
+      if (!soundOnEl || soundOnEl.checked){
+        try { winSound.currentTime = 0; winSound.play(); } catch(e){}
+      }
     }
 
     function parseNames(){
       const raw = namesEl.value.replace(/\n/g, ',');
-      const parts = raw.split(',').map(s=>s.trim()).filter(Boolean);
-      const dedup = Array.from(new Set(parts));
-      return dedup;
+      const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
+      const map = new Map();
+      for (const token of parts){
+        const m = token.match(/^(.+?)(?:\*\s*(\d+))?$/);
+        if (!m) continue;
+        const name = m[1].trim();
+        const weight = Math.max(1, parseInt(m[2] || '1', 10));
+        if (!name) continue;
+        map.set(name, (map.get(name) ?? 0) + weight);
+      }
+      return Array.from(map.entries()).map(([name, weight]) => ({ name, weight }));
     }
 
     function renderChips(){
       chipsEl.innerHTML = '';
-      participants.forEach((p,i)=>{
+      participants.forEach(p => {
         const d = document.createElement('div');
         d.className = 'chip';
-        d.textContent = p;
+        d.textContent = `${p.name} × ${p.weight}`;
         chipsEl.appendChild(d);
       });
       statN.textContent = participants.length;
     }
 
-    function colorFor(i, n){
-      const h = (i*360/n)%360;return `hsl(${h} 70% 62%)`;
-    }
+    function colorFor(i, n){ const h = (i*360/n)%360; return `hsl(${h} 70% 62%)`; }
 
     function drawWheel(){
       const n = participants.length;
-      let winners = [];
-      let history = [];
       ctx.clearRect(0,0,canvas.width,canvas.height);
-      if(n===0){
+
+      if (n === 0){
         ctx.fillStyle = '#121826';
         ctx.fillRect(0,0,canvas.width,canvas.height);
         return;
       }
+
+      const totalW = participants.reduce((a,p)=>a+p.weight,0);
+      const unit = 2*Math.PI/totalW;
       const cx = canvas.width/2, cy = canvas.height/2, r = canvas.width*0.48;
-      const arc = 2*Math.PI/n;
+
       ctx.save();
-      ctx.translate(cx, cy);
+      ctx.translate(cx,cy);
       ctx.rotate(angle);
-      for(let i=0;i<n;i++){
+
+      let cur = 0;
+      for (let i=0;i<n;i++){
+        const p = participants[i];
+        const start = cur;
+        const end = cur + p.weight*unit;
+
         ctx.beginPath();
         ctx.moveTo(0,0);
-        ctx.arc(0,0,r,i*arc,(i+1)*arc);
+        ctx.arc(0,0,r,start,end);
         ctx.closePath();
         ctx.fillStyle = colorFor(i,n);
         ctx.fill();
+
+        const mid = (start+end)/2;
         ctx.save();
-        ctx.rotate(i*arc + arc/2);
+        ctx.rotate(mid);
         ctx.textAlign = 'right';
         ctx.fillStyle = '#0b0d12';
         ctx.font = '32px Pretendard, Arial';
-        ctx.fillText(participants[i], r-24, 10);
+        ctx.fillText(p.name, r-24, 10);
         ctx.restore();
+
+        cur = end;
       }
+
       ctx.beginPath();
       ctx.arc(0,0,r,0,Math.PI*2);
       ctx.lineWidth = 18;
@@ -239,6 +268,7 @@
       grd.addColorStop(1,'#202a49');
       ctx.strokeStyle = grd;
       ctx.stroke();
+
       ctx.restore();
     }
 
@@ -256,30 +286,40 @@
     }
 
     function pickIndex(){
-        const n = participants.length;
-        if (n === 0) return -1;
-        const arc = 2 * Math.PI / n;
-        const pointer = -Math.PI / 2;
-        const a = (pointer - (angle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
-        return Math.floor((a + arc/2) / arc) % n;
+      const n = participants.length;
+      if (n === 0) return -1;
+      const totalW = participants.reduce((a,p)=>a+p.weight,0);
+      const unit = 2*Math.PI/totalW;
+      const pointer = -Math.PI/2;
+      const a = (pointer - (angle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+      let cur = 0;
+      for (let i=0;i<n;i++){
+        const start = cur;
+        const end = cur + participants[i].weight * unit;
+        if (a >= start && a < end) return i;
+        cur = end;
+      }
+      return n-1;
     }
 
     function onStop(){
       drawWheel();
+      stopSpinSound();
+      playWin();
       const idx = pickIndex();
-      if(idx<0) return;
-      const picked = participants[idx];
+      if (idx < 0) return;
+      const picked = participants[idx].name;
       winners.push(picked);
       history.unshift({name:picked, ts:new Date().toLocaleString()});
       winnerEl.textContent = `당첨: ${picked}`;
       renderHistory();
-      if(noRepeatEl.checked){
+      if (noRepeatEl.checked){
         participants.splice(idx,1);
         drawWheel();
         renderChips();
       }
       const remainToPick = Math.max(0, Number(countEl.value||1) - winners.length);
-      if(autoNextEl.checked && remainToPick>0 && participants.length>0){
+      if (autoNextEl.checked && remainToPick>0 && participants.length>0){
         setTimeout(()=>spinOne(), 700);
       }
     }
@@ -305,31 +345,58 @@
       statV.textContent = '0'; statA.textContent = '0';
     }
 
-    function spinHoldStart(){ if(spinning||participants.length===0) return; spinning=true; angVel=0.05; step(); pressTimer=setInterval(()=>{angVel=Math.min(angVel+0.02, 1.35)}, 60) }
-    function spinHoldEnd(){ clearInterval(pressTimer); pressTimer=null }
+    function spinHoldStart(){
+      if(spinning || participants.length===0) return;
+      spinning = true;
+      angVel = 0.05;
+      applyVolume(); playSpin();
+      step();
+      pressTimer = setInterval(()=>{ angVel = Math.min(angVel + 0.02, 1.35); }, 60);
+    }
+    function spinHoldEnd(){
+      if (pressTimer){ clearInterval(pressTimer); pressTimer = null; }
+    }
 
-    function spinOne(){ if(spinning||participants.length===0) return; spinning=true; angVel = 0.35 + Math.random()*0.9; step() }
-    function forceStop(){ if(!spinning) return; stopSpinSound(); angVel = Math.min(angVel, 0.001) }
+    function spinOne(){
+      if(spinning || participants.length===0) return;
+      spinning = true;
+      angVel = 0.35 + Math.random()*0.9;
+      applyVolume(); playSpin();
+      step();
+    }
+
+    function forceStop(){
+      if(!spinning) return;
+      stopSpinSound();
+      angVel = Math.min(angVel, 0.02);
+    }
 
     btnInit.addEventListener('click', init);
-    btnReset.addEventListener('click', ()=>{namesEl.value=''; chipsEl.innerHTML=''; participants=[]; winners=[]; history=[]; drawWheel(); renderHistory(); winnerEl.textContent=''; statN.textContent='0'});
+    btnReset.addEventListener('click', ()=>{
+      namesEl.value=''; chipsEl.innerHTML=''; participants=[]; winners=[]; history=[];
+      drawWheel(); renderHistory(); winnerEl.textContent=''; statN.textContent='0'
+    });
+
     btnSpinHold.addEventListener('mousedown', spinHoldStart);
-    btnSpinHold.addEventListener('touchstart', spinHoldStart);
-    btnSpinHold.addEventListener('mouseup', spinHoldEnd);
-    btnSpinHold.addEventListener('touchend', spinHoldEnd);
-    btnSpinHold.addEventListener('mouseleave', spinHoldEnd);
-    btnSpinHold.addEventListener('touchleave', spinHoldEnd);
+    btnSpinHold.addEventListener('mouseup',   spinHoldEnd);
+    btnSpinHold.addEventListener('mouseleave',spinHoldEnd);
+    btnSpinHold.addEventListener('touchstart', (e)=>{ e.preventDefault(); spinHoldStart(); }, {passive:false});
+    btnSpinHold.addEventListener('touchend',   (e)=>{ e.preventDefault(); spinHoldEnd();   }, {passive:false});
+    btnSpinHold.addEventListener('touchcancel',(e)=>{ e.preventDefault(); spinHoldEnd();   }, {passive:false});
+
     btnSpinOne.addEventListener('click', spinOne);
     btnStop.addEventListener('click', forceStop);
 
     namesEl.addEventListener('input', ()=>{participants=parseNames(); renderChips(); drawWheel()});
     countEl.addEventListener('input', ()=>{if(Number(countEl.value)<1) countEl.value=1});
+    volEl.addEventListener('input', applyVolume);
 
     btnExport.addEventListener('click', ()=>{
       const txt = winners.length? `당첨자 ${winners.length}명\n`+winners.join('\n') : '당첨 내역이 없습니다.';
       navigator.clipboard.writeText(txt).then(()=>{btnExport.textContent='복사 완료'; setTimeout(()=>btnExport.textContent='결과 복사',1200)});
     });
 
+    applyVolume();
     init();
   </script>
 </body>
