@@ -266,8 +266,6 @@
       history.unshift({name:picked, ts:new Date().toLocaleString()});
       winnerEl.textContent = `당첨: ${picked}`;
       renderHistory();
-      stopSpinSound();
-      playWin();
       if(noRepeatEl.checked){
         participants.splice(idx,1);
         drawWheel();
