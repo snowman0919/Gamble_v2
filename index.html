@@ -198,6 +198,8 @@
 
     function drawWheel(){
       const n = participants.length;
+      let winners = [];
+      let history = [];
       ctx.clearRect(0,0,canvas.width,canvas.height);
       if(n===0){
         ctx.fillStyle = '#121826';
