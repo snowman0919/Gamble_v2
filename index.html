@@ -49,7 +49,6 @@
     .readout{font-feature-settings:"tnum" on, "lnum" on;display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:center}
     .pill{padding:6px 9px;border-radius:999px;background:var(--panel);border:1px solid rgba(255,255,255,.08);font-size:13px;color:var(--muted)}
 
-    /* 멀티 휠 레이아웃 */
     .wheel-wrap{display:grid;grid-template-rows:auto auto;place-items:center;gap:16px}
     .wheel-grid{display:grid;grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px;width:100%}
     .canvas-shell{position:relative;width:100%;aspect-ratio:1;border-radius:24px;padding:14px;background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06)}
@@ -133,18 +132,15 @@
     </footer>
   </div>
 
-  <!-- 프로젝트 경로에 맞게 교체하세요 -->
   <audio id="spinAudio" preload="auto" src="./sounds/spin-loop.mp3"></audio>
   <audio id="winAudio"  preload="auto" src="./sounds/win-chime.mp3"></audio>
 
   <script>
     const el = s => document.querySelector(s);
 
-    // 오디오
     const spinSound = el('#spinAudio');
     const winSound  = el('#winAudio');
 
-    // UI
     const namesEl   = el('#names');
     const chipsEl   = el('#chips');
     const noRepeatEl= el('#noRepeat');
@@ -168,7 +164,6 @@
     const multiWrap = el('#multiWrap');
     const wheelNumEl= el('#wheelNum');
 
-    // 상태
     let participants = []; // [{name, weight}]
     let winners = [];      // [string]
     let history = [];      // [{name, ts, wheel}]
@@ -176,14 +171,12 @@
     let raf = null;
     let pressTimer = null;
 
-    // 난수(암호학적)
     function cryptoRandom() {
       const arr = new Uint32Array(1);
       crypto.getRandomValues(arr);
       return arr[0] / (0xFFFFFFFF + 1);
     }
 
-    // 오디오 제어
     function applyVolume(){
       const v = Number(volEl?.value ?? 0.6);
       spinSound.volume = v;
@@ -204,7 +197,6 @@
       }
     }
 
-    // 파서: "이름*숫자"
     function parseNames(){
       const raw = namesEl.value.replace(/\n/g, ',');
       const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
@@ -233,7 +225,6 @@
 
     function colorFor(i, n){ const h = (i*360/n)%360; return `hsl(${h} 70% 62%)`; }
 
-    // 휠 하나 만들기
     function createWheel(idx){
       const shell = document.createElement('div');
       shell.className = 'canvas-shell';
@@ -243,7 +234,7 @@
       shell.appendChild(pointer);
 
       const cv = document.createElement('canvas');
-      const size = 900; // 내부 해상도(샤프한 텍스트용), 필요시 700~1100 조절
+      const size = 900;
       cv.width = size; cv.height = size;
       shell.appendChild(cv);
 
@@ -253,7 +244,7 @@
         index: idx,
         canvas: cv,
         ctx: cv.getContext('2d'),
-        angle: cryptoRandom() * Math.PI * 2, // 초기 각도 랜덤
+        angle: cryptoRandom() * Math.PI * 2,
         angVel: 0,
         spinning: false
       };
@@ -261,13 +252,11 @@
       return w;
     }
 
-    // 휠 N개 구성
     function buildWheels(n){
       multiWrap.innerHTML = '';
       wheels = Array.from({length:n}, (_,i)=>createWheel(i+1));
     }
 
-    // 가중치 기반 그리기(각 휠 공통)
     function drawWheel(w){
       const { ctx, canvas } = w;
       const n = participants.length;
@@ -325,7 +314,6 @@
       ctx.restore();
     }
 
-    // 포인터는 12시(-π/2)
     function pickIndex(w){
       const n = participants.length;
       if (n === 0) return -1;
@@ -343,7 +331,6 @@
       return n-1;
     }
 
-    // 모든 휠 업데이트 루프
     function stepAll(){
       let anySpinning = false;
 
@@ -359,7 +346,6 @@
         drawWheel(w);
       }
 
-      // 대표 수치(첫 휠 기준)
       const rep = wheels[0];
       if (rep){
         statV.textContent = (rep.angVel || 0).toFixed(3);
@@ -370,7 +356,6 @@
       else {
         if (raf){ cancelAnimationFrame(raf); raf=null; }
         stopSpinSound();
-        // 자동 반복: 전부 멈춘 뒤 재시작
         if (autoNextEl.checked && participants.length>0){
           setTimeout(()=>spinAllOne(), 600);
         }
@@ -408,7 +393,6 @@
       });
     }
 
-    // 초기화
     function init(){
       participants = parseNames();
       winners = [];
@@ -421,7 +405,6 @@
       buildWheels(n);
     }
 
-    // 스핀 제어
     function spinHoldStart(){
       if (participants.length===0) return;
       if (wheels.some(w=>w.spinning)) return;
@@ -453,7 +436,6 @@
 
       for (const w of wheels){
         w.spinning = true;
-        // 초기 각도는 이미 랜덤, 초기 속도는 암호학적 난수
         w.angVel = 0.50 + cryptoRandom() * 1.5;
       }
       if (!raf) raf = requestAnimationFrame(stepAll);
@@ -465,7 +447,6 @@
       }
     }
 
-    // 이벤트 바인딩
     btnInit.addEventListener('click', init);
     btnReset.addEventListener('click', ()=>{
       namesEl.value=''; chipsEl.innerHTML=''; participants=[]; winners=[]; history=[];
@@ -475,11 +456,9 @@
       stopSpinSound();
     });
 
-    // 마우스
     btnSpinHold.addEventListener('mousedown', spinHoldStart);
     btnSpinHold.addEventListener('mouseup',   spinHoldEnd);
     btnSpinHold.addEventListener('mouseleave',spinHoldEnd);
-    // 터치
     btnSpinHold.addEventListener('touchstart', (e)=>{ e.preventDefault(); spinHoldStart(); }, {passive:false});
     btnSpinHold.addEventListener('touchend',   (e)=>{ e.preventDefault(); spinHoldEnd();   }, {passive:false});
     btnSpinHold.addEventListener('touchcancel',(e)=>{ e.preventDefault(); spinHoldEnd();   }, {passive:false});
@@ -499,7 +478,6 @@
       navigator.clipboard.writeText(txt).then(()=>{btnExport.textContent='복사 완료'; setTimeout(()=>btnExport.textContent='결과 복사',1200)});
     });
 
-    // 시작
     applyVolume();
     init();
   </script>
