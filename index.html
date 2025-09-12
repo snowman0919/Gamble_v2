@@ -357,10 +357,16 @@
       if (pressTimer){ clearInterval(pressTimer); pressTimer = null; }
     }
 
+    function cryptoRandom() {
+      const array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
+      return array[0] / (0xFFFFFFFF + 1);
+    }
+
     function spinOne(){
       if(spinning || participants.length===0) return;
       spinning = true;
-      angVel = 0.50 + Math.random()*1.5;
+      angVel = 0.50 + cryptoRandom() * 1.5;
       applyVolume(); playSpin();
       step();
     }
