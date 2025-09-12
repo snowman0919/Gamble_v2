@@ -360,7 +360,7 @@
     function spinOne(){
       if(spinning || participants.length===0) return;
       spinning = true;
-      angVel = 0.35 + Math.random()*0.9;
+      angVel = 0.50 + Math.random()*1.5;
       applyVolume(); playSpin();
       step();
     }
