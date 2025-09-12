@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>발표자 뽑기 V2</title>
+  <title>발표자 뽑기 V2 (멀티 휠)</title>
   <style>
     :root{
       --bg:#0b0d12;--panel:#131722;--panel-2:#0f1320;--text:#e6ebf5;--muted:#9aa4b2;--accent:#7aa2ff;--accent-2:#9d7aff;--ring:rgba(122,162,255,.35);
@@ -46,17 +46,19 @@
     .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
     .chip{font-size:12px;padding:6px 10px;border-radius:999px;background:var(--panel-2);border:1px solid rgba(255,255,255,.06)}
 
-    .wheel-wrap{display:grid;grid-template-rows:auto auto;place-items:center;gap:16px}
-    .canvas-shell{position:relative;width:min(520px, 92vw);aspect-ratio:1;border-radius:24px;padding:14px;background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06)}
-    canvas{width:100%;height:100%;display:block;border-radius:16px;background:radial-gradient(120% 120% at 50% 40%, #141b2c 0%, #0f1422 60%, #0b0d12 100%)}
-    .pointer{position:absolute;left:0;right:0;top:20px;margin:auto;width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:24px solid var(--accent)}
-
     .readout{font-feature-settings:"tnum" on, "lnum" on;display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:center}
     .pill{padding:6px 9px;border-radius:999px;background:var(--panel);border:1px solid rgba(255,255,255,.08);font-size:13px;color:var(--muted)}
 
+    /* 멀티 휠 레이아웃 */
+    .wheel-wrap{display:grid;grid-template-rows:auto auto;place-items:center;gap:16px}
+    .wheel-grid{display:grid;grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px;width:100%}
+    .canvas-shell{position:relative;width:100%;aspect-ratio:1;border-radius:24px;padding:14px;background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.06)}
+    .canvas-shell canvas{width:100%;height:100%;display:block;border-radius:16px;background:radial-gradient(120% 120% at 50% 40%, #141b2c 0%, #0f1422 60%, #0b0d12 100%)}
+    .canvas-shell .pointer{position:absolute;left:0;right:0;top:10px;margin:auto;width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:24px solid var(--accent)}
+
     .result{display:flex;flex-direction:column;gap:8px}
     .result .who{font-size:18px;font-weight:700}
-    .history{display:flex;flex-direction:column;gap:6px;max-height:180px;overflow:auto}
+    .history{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow:auto}
     .history-item{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;background:var(--panel-2);border:1px solid rgba(255,255,255,.06)}
 
     .tog{display:flex;align-items:center;gap:8px}
@@ -85,27 +87,35 @@
         <p class="section-title">참여자 입력</p>
         <textarea id="names" class="input" placeholder="쉼표 또는 줄바꿈. 가중치는 *숫자 (예: 홍길동*3)" spellcheck="false">1번 강원재*1, 2번 구본정*1, 3번 김가은*1, 4번 김도경*1, 5번 김리온*1, 6번 김서진*1, 7번 김서현*1, 8번 김하윤*1, 9번 김현우*1, 10번 김호성*1, 11번 남우진*1, 12번 박서윤*1, 13번 박선영*1, 14번 박소은*1, 15번 박준우*1, 16번 손지완*1, 17번 여서연*1, 18번 여지원*1, 19번 유정훈*1, 20번 이수영*1, 21번 이지환*1, 22번 이호연*1, 23번 장준혁*1, 24번 정찬빈*1, 25번 조예원*1, 26번 조원*1, 27번 진서윤*1, 28번 최윤혁*1, 29번 최혁*1, 30번 한예성*1, 31번 홍성현*1</textarea>
         <div id="chips" class="chips"></div>
+
         <div class="row">
-          <label class="section-title">뽑을 인원</label>
-          <input id="count" class="number" type="number" min="1" value="1" style="width:90px"/>
-          <div class="tog"><input id="noRepeat" type="checkbox" unchecked><span class="section-title">중복 금지</span></div>
-          <div class="tog"><input id="autoNext" type="checkbox" checked><span class="section-title">자동 반복</span></div>
+          <label class="section-title">동시 돌릴 개수</label>
+          <input id="wheelNum" class="number" type="number" min="1" max="12" value="1" style="width:90px"/>
         </div>
+
         <div class="row">
-          <div class="tog"><input id="soundOn" type="checkbox" unchecked><span class="section-title">사운드</span></div>
+          <div class="tog"><input id="noRepeat" type="checkbox" checked><span class="section-title">중복 금지</span></div>
+          <div class="tog"><input id="autoNext" type="checkbox"><span class="section-title">자동 반복</span></div>
+        </div>
+
+        <div class="row">
+          <div class="tog"><input id="soundOn" type="checkbox" checked><span class="section-title">사운드</span></div>
           <input id="vol" class="number" type="range" min="0" max="1" step="0.01" value="0.6" style="width:160px"/>
         </div>
+
         <div class="row">
           <button id="btnInit" class="btn success">돌림판 생성</button>
           <button id="btnSpinHold" class="btn primary">누르고 회전</button>
           <button id="btnSpinOne" class="btn primary">원클릭 회전</button>
           <button id="btnStop" class="btn ghost">멈추기</button>
         </div>
+
         <div class="readout">
           <div class="pill mono">참가자: <span id="statN">0</span></div>
           <div class="pill mono">속도: <span id="statV">0</span></div>
           <div class="pill mono">각도: <span id="statA">0</span></div>
         </div>
+
         <div class="result">
           <div id="resultTitle" class="section-title">결과</div>
           <div id="winner" class="who"></div>
@@ -114,10 +124,7 @@
       </section>
 
       <section class="card wheel-wrap">
-        <div class="canvas-shell">
-          <div class="pointer"></div>
-          <canvas id="wheelCanvas" width="1000" height="1000"></canvas>
-        </div>
+        <div id="multiWrap" class="wheel-grid"></div>
       </section>
     </div>
 
@@ -126,54 +133,62 @@
     </footer>
   </div>
 
+  <!-- 프로젝트 경로에 맞게 교체하세요 -->
   <audio id="spinAudio" preload="auto" src="./sounds/spin-loop.mp3"></audio>
-  <audio id="winAudio" preload="auto"  src="./sounds/win-chime.mp3"></audio>
+  <audio id="winAudio"  preload="auto" src="./sounds/win-chime.mp3"></audio>
 
   <script>
     const el = s => document.querySelector(s);
 
+    // 오디오
     const spinSound = el('#spinAudio');
     const winSound  = el('#winAudio');
 
-    const namesEl = el('#names');
-    const chipsEl = el('#chips');
-    const countEl = el('#count');
-    const noRepeatEl = el('#noRepeat');
-    const autoNextEl = el('#autoNext');
+    // UI
+    const namesEl   = el('#names');
+    const chipsEl   = el('#chips');
+    const noRepeatEl= el('#noRepeat');
+    const autoNextEl= el('#autoNext');
     const soundOnEl = el('#soundOn');
-    const volEl = el('#vol');
+    const volEl     = el('#vol');
 
-    const btnInit = el('#btnInit');
-    const btnSpinHold = el('#btnSpinHold');
-    const btnSpinOne = el('#btnSpinOne');
-    const btnStop = el('#btnStop');
+    const btnInit   = el('#btnInit');
+    const btnSpinHold=el('#btnSpinHold');
+    const btnSpinOne= el('#btnSpinOne');
+    const btnStop   = el('#btnStop');
     const btnExport = el('#btnExport');
-    const btnReset = el('#btnReset');
-    const statN = el('#statN');
-    const statV = el('#statV');
-    const statA = el('#statA');
-    const winnerEl = el('#winner');
+    const btnReset  = el('#btnReset');
+
+    const statN     = el('#statN');
+    const statV     = el('#statV');
+    const statA     = el('#statA');
+    const winnerEl  = el('#winner');
     const historyEl = el('#history');
 
-    const canvas = el('#wheelCanvas');
-    const ctx = canvas.getContext('2d');
+    const multiWrap = el('#multiWrap');
+    const wheelNumEl= el('#wheelNum');
 
+    // 상태
     let participants = []; // [{name, weight}]
-    let winners = [];
-    let history = [];
-
-    let angle = 0;
-    let angVel = 0;
+    let winners = [];      // [string]
+    let history = [];      // [{name, ts, wheel}]
+    let wheels  = [];      // [{canvas, ctx, angle, angVel, spinning}]
     let raf = null;
-    let spinning = false;
     let pressTimer = null;
 
+    // 난수(암호학적)
+    function cryptoRandom() {
+      const arr = new Uint32Array(1);
+      crypto.getRandomValues(arr);
+      return arr[0] / (0xFFFFFFFF + 1);
+    }
+
+    // 오디오 제어
     function applyVolume(){
       const v = Number(volEl?.value ?? 0.6);
       spinSound.volume = v;
       winSound.volume  = Math.min(1, v + 0.15);
     }
-
     function playSpin(){
       if (!soundOnEl || soundOnEl.checked){
         try { spinSound.currentTime = 0; spinSound.loop = true; spinSound.play(); } catch(e){}
@@ -189,6 +204,7 @@
       }
     }
 
+    // 파서: "이름*숫자"
     function parseNames(){
       const raw = namesEl.value.replace(/\n/g, ',');
       const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
@@ -217,8 +233,45 @@
 
     function colorFor(i, n){ const h = (i*360/n)%360; return `hsl(${h} 70% 62%)`; }
 
-    function drawWheel(){
+    // 휠 하나 만들기
+    function createWheel(idx){
+      const shell = document.createElement('div');
+      shell.className = 'canvas-shell';
+
+      const pointer = document.createElement('div');
+      pointer.className = 'pointer';
+      shell.appendChild(pointer);
+
+      const cv = document.createElement('canvas');
+      const size = 900; // 내부 해상도(샤프한 텍스트용), 필요시 700~1100 조절
+      cv.width = size; cv.height = size;
+      shell.appendChild(cv);
+
+      multiWrap.appendChild(shell);
+
+      const w = {
+        index: idx,
+        canvas: cv,
+        ctx: cv.getContext('2d'),
+        angle: cryptoRandom() * Math.PI * 2, // 초기 각도 랜덤
+        angVel: 0,
+        spinning: false
+      };
+      drawWheel(w);
+      return w;
+    }
+
+    // 휠 N개 구성
+    function buildWheels(n){
+      multiWrap.innerHTML = '';
+      wheels = Array.from({length:n}, (_,i)=>createWheel(i+1));
+    }
+
+    // 가중치 기반 그리기(각 휠 공통)
+    function drawWheel(w){
+      const { ctx, canvas } = w;
       const n = participants.length;
+
       ctx.clearRect(0,0,canvas.width,canvas.height);
 
       if (n === 0){
@@ -233,7 +286,7 @@
 
       ctx.save();
       ctx.translate(cx,cy);
-      ctx.rotate(angle);
+      ctx.rotate(w.angle);
 
       let cur = 0;
       for (let i=0;i<n;i++){
@@ -272,26 +325,14 @@
       ctx.restore();
     }
 
-    function step(){
-      if(!spinning) return;
-      angle += angVel;
-      angVel *= 0.9925;
-      if(angVel < 0.002){
-        angVel = 0; spinning = false; cancelAnimationFrame(raf); raf=null; onStop(); return;
-      }
-      statV.textContent = angVel.toFixed(3);
-      statA.textContent = ((angle%(2*Math.PI))*180/Math.PI).toFixed(1);
-      drawWheel();
-      raf = requestAnimationFrame(step);
-    }
-
-    function pickIndex(){
+    // 포인터는 12시(-π/2)
+    function pickIndex(w){
       const n = participants.length;
       if (n === 0) return -1;
       const totalW = participants.reduce((a,p)=>a+p.weight,0);
       const unit = 2*Math.PI/totalW;
       const pointer = -Math.PI/2;
-      const a = (pointer - (angle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+      const a = (pointer - (w.angle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
       let cur = 0;
       for (let i=0;i<n;i++){
         const start = cur;
@@ -302,106 +343,163 @@
       return n-1;
     }
 
-    function onStop(){
-      drawWheel();
-      stopSpinSound();
+    // 모든 휠 업데이트 루프
+    function stepAll(){
+      let anySpinning = false;
+
+      for (const w of wheels){
+        if (!w.spinning) continue;
+        anySpinning = true;
+        w.angle += w.angVel;
+        w.angVel *= 0.9925; // 감속
+        if (w.angVel < 0.002){
+          w.angVel = 0; w.spinning = false;
+          onStop(w);
+        }
+        drawWheel(w);
+      }
+
+      // 대표 수치(첫 휠 기준)
+      const rep = wheels[0];
+      if (rep){
+        statV.textContent = (rep.angVel || 0).toFixed(3);
+        statA.textContent = (((rep?.angle||0)%(2*Math.PI))*180/Math.PI).toFixed(1);
+      }
+
+      if (anySpinning) { raf = requestAnimationFrame(stepAll); }
+      else {
+        if (raf){ cancelAnimationFrame(raf); raf=null; }
+        stopSpinSound();
+        // 자동 반복: 전부 멈춘 뒤 재시작
+        if (autoNextEl.checked && participants.length>0){
+          setTimeout(()=>spinAllOne(), 600);
+        }
+      }
+    }
+
+    function onStop(w){
+      drawWheel(w);
       playWin();
-      const idx = pickIndex();
+
+      const idx = pickIndex(w);
       if (idx < 0) return;
       const picked = participants[idx].name;
+
       winners.push(picked);
-      history.unshift({name:picked, ts:new Date().toLocaleString()});
+      history.unshift({name:picked, ts:new Date().toLocaleString(), wheel:w.index});
       winnerEl.textContent = `당첨: ${picked}`;
       renderHistory();
+
       if (noRepeatEl.checked){
         participants.splice(idx,1);
-        drawWheel();
+        wheels.forEach(drawWheel);
         renderChips();
-      }
-      const remainToPick = Math.max(0, Number(countEl.value||1) - winners.length);
-      if (autoNextEl.checked && remainToPick>0 && participants.length>0){
-        setTimeout(()=>spinOne(), 700);
       }
     }
 
     function renderHistory(){
       historyEl.innerHTML = '';
-      history.slice(0,50).forEach(h=>{
+      history.slice(0,80).forEach(h=>{
         const d = document.createElement('div');
         d.className = 'history-item';
-        const l = document.createElement('div'); l.textContent = h.name;
+        const l = document.createElement('div'); l.textContent = `${h.name} (휠 ${h.wheel})`;
         const r = document.createElement('div'); r.className='section-title'; r.textContent = h.ts;
         d.appendChild(l); d.appendChild(r); historyEl.appendChild(d);
       });
     }
 
+    // 초기화
     function init(){
       participants = parseNames();
       winners = [];
-      angle = 0; angVel = 0; spinning=false; if(raf){cancelAnimationFrame(raf); raf=null}
-      renderChips();
-      drawWheel();
+      history = [];
       winnerEl.textContent = '';
       statV.textContent = '0'; statA.textContent = '0';
+      renderChips();
+
+      const n = Math.max(1, Math.min(12, Number(wheelNumEl?.value||1)));
+      buildWheels(n);
     }
 
+    // 스핀 제어
     function spinHoldStart(){
-      if(spinning || participants.length===0) return;
-      spinning = true;
-      angVel = 0.05;
+      if (participants.length===0) return;
+      if (wheels.some(w=>w.spinning)) return;
+
       applyVolume(); playSpin();
-      step();
-      pressTimer = setInterval(()=>{ angVel = Math.min(angVel + 0.02, 1.35); }, 60);
+
+      for (const w of wheels){
+        w.spinning = true;
+        w.angVel = 0.05;
+      }
+      if (pressTimer) clearInterval(pressTimer);
+      pressTimer = setInterval(()=>{
+        for (const w of wheels){
+          if (w.spinning) w.angVel = Math.min(w.angVel + 0.02, 1.35);
+        }
+      }, 60);
+
+      if (!raf) raf = requestAnimationFrame(stepAll);
     }
     function spinHoldEnd(){
       if (pressTimer){ clearInterval(pressTimer); pressTimer = null; }
     }
 
-    function cryptoRandom() {
-      const array = new Uint32Array(1);
-      window.crypto.getRandomValues(array);
-      return array[0] / (0xFFFFFFFF + 1);
-    }
+    function spinAllOne(){
+      if (participants.length===0) return;
+      if (wheels.some(w=>w.spinning)) return;
 
-    function spinOne(){
-      if(spinning || participants.length===0) return;
-      spinning = true;
-      angVel = 0.50 + cryptoRandom() * 1.5;
       applyVolume(); playSpin();
-      step();
+
+      for (const w of wheels){
+        w.spinning = true;
+        // 초기 각도는 이미 랜덤, 초기 속도는 암호학적 난수
+        w.angVel = 0.50 + cryptoRandom() * 1.5;
+      }
+      if (!raf) raf = requestAnimationFrame(stepAll);
     }
 
     function forceStop(){
-      if(!spinning) return;
-    //   stopSpinSound();
-      angVel = Math.min(angVel, 0.005);
+      for (const w of wheels){
+        if (w.spinning) w.angVel = Math.min(w.angVel, 0.005);
+      }
     }
 
+    // 이벤트 바인딩
     btnInit.addEventListener('click', init);
     btnReset.addEventListener('click', ()=>{
       namesEl.value=''; chipsEl.innerHTML=''; participants=[]; winners=[]; history=[];
-      drawWheel(); renderHistory(); winnerEl.textContent=''; statN.textContent='0'
+      multiWrap.innerHTML = ''; winnerEl.textContent=''; statN.textContent='0';
+      historyEl.innerHTML = '';
+      if (raf){ cancelAnimationFrame(raf); raf=null; }
+      stopSpinSound();
     });
 
+    // 마우스
     btnSpinHold.addEventListener('mousedown', spinHoldStart);
     btnSpinHold.addEventListener('mouseup',   spinHoldEnd);
     btnSpinHold.addEventListener('mouseleave',spinHoldEnd);
+    // 터치
     btnSpinHold.addEventListener('touchstart', (e)=>{ e.preventDefault(); spinHoldStart(); }, {passive:false});
     btnSpinHold.addEventListener('touchend',   (e)=>{ e.preventDefault(); spinHoldEnd();   }, {passive:false});
     btnSpinHold.addEventListener('touchcancel',(e)=>{ e.preventDefault(); spinHoldEnd();   }, {passive:false});
 
-    btnSpinOne.addEventListener('click', spinOne);
+    btnSpinOne.addEventListener('click', spinAllOne);
     btnStop.addEventListener('click', forceStop);
 
-    namesEl.addEventListener('input', ()=>{participants=parseNames(); renderChips(); drawWheel()});
-    countEl.addEventListener('input', ()=>{if(Number(countEl.value)<1) countEl.value=1});
+    namesEl.addEventListener('input', ()=>{participants=parseNames(); renderChips(); wheels.forEach(drawWheel);});
     volEl.addEventListener('input', applyVolume);
+    wheelNumEl.addEventListener('input', ()=>{
+      const n = Math.max(1, Math.min(12, Number(wheelNumEl.value||1)));
+      buildWheels(n);
+    });
 
     btnExport.addEventListener('click', ()=>{
       const txt = winners.length? `당첨자 ${winners.length}명\n`+winners.join('\n') : '당첨 내역이 없습니다.';
       navigator.clipboard.writeText(txt).then(()=>{btnExport.textContent='복사 완료'; setTimeout(()=>btnExport.textContent='결과 복사',1200)});
     });
 
+    // 시작
     applyVolume();
     init();
   </script>
