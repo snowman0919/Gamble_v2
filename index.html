@@ -368,7 +368,7 @@
     function forceStop(){
       if(!spinning) return;
       stopSpinSound();
-      angVel = Math.min(angVel, 0.02);
+      angVel = Math.min(angVel, 0.009);
     }
 
     btnInit.addEventListener('click', init);
